@@ -12,7 +12,10 @@ namespace ParallelTestRunner.Impl
             Output = "Result.trx";
             ThreadCount = 4;
             PLevel = PLevel.TestClass;
+            LoggedVariables = false;
         }
+
+        private bool LoggedVariables { get; set; }
 
         public string Provider { get; set; }
         
@@ -28,7 +31,22 @@ namespace ParallelTestRunner.Impl
 
         public string GetExecutablePath()
         {
-            return ConfigurationManager.AppSettings.Get(Provider);
+            var environmentVariable = ConfigurationManager.AppSettings.Get(Provider);
+            var commonToolPath = Environment.GetEnvironmentVariable(environmentVariable);
+            var vstestSubPath = "..\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe";
+
+            if (string.IsNullOrEmpty(commonToolPath))
+            {
+                throw new Exception($"Cannot locate commonToolPath to use. Please check your EnvironmentVariable with value '{environmentVariable}'. These are parsed from the given provider: '{Provider}'");
+            }
+
+            if (!LoggedVariables)
+            {
+                Console.WriteLine($"Running with the following variables: environmentVariable:'{environmentVariable}', commonToolPath:'{commonToolPath}', vstestSubPath:'{vstestSubPath}'");
+                LoggedVariables = true;
+            }
+            var vstestFullPath = Path.Combine(commonToolPath, vstestSubPath);
+            return vstestFullPath;
         }
 
         public bool IsValid()
