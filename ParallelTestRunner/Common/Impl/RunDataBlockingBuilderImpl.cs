@@ -33,9 +33,21 @@ namespace ParallelTestRunner.Common.Impl
                 }
 
                 item = CreateNewFromFixture(assembly, fixture);
-                lastFixtureName = fixture.Name;
+                /*
+                if (item == null)
+                {
+                    item = CreateNewFromFixture(assembly, fixture);
+                }
+                else
+                {
+                    item.Fixtures.Add(fixture);
+                }
+                */
                 items.Add(item);
+                lastFixtureName = fixture.Name;
+
             }
+            //items.Add(item);
 
             return items;
         }
